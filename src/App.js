@@ -1,23 +1,31 @@
-import logo from './logo.svg';
+import React from 'react';
+import { useState, useEffect } from 'react';
+import axios from './config/axios';
+import LocalStorageService from './services/LocalStorageService';
+import PrivateRoutes from './Route/PrivateRoutes';
 import './App.css';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 function App() {
+  const [role, setRole] = useState(LocalStorageService.getRole());
+
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get('/users/me')
+      .then((res) => {
+        console.log(res.data.user);
+        setUser(res.data.user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [role]);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <PrivateRoutes role={role} setRole={setRole} user={user} />
     </div>
   );
 }
